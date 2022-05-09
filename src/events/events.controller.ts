@@ -13,7 +13,7 @@ import {
 import { EventsService } from './events.service';
 import { Event, EventType } from './events.entity';
 import { EventRO } from './events.interface';
-import { AddEventDto, UpdateEventDto } from './dto';
+import { AddEventDto, EditEventDto } from './dto';
 import { DeleteResult } from 'typeorm';
 
 @Controller('events')
@@ -56,7 +56,7 @@ export class EventsController {
   @Put(':eventId')
   async editEvent(
     @Param('eventId', ParseIntPipe) eventId: number,
-    @Body() eventData: UpdateEventDto,
+    @Body() eventData: EditEventDto,
   ): Promise<Event> {
     const { eventTypeId } = eventData;
 

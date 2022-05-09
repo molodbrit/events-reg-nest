@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsInt, IsBoolean, Length } from 'class-validator';
 
-export class UpdateEventDto {
+export class EditEventDto {
   @IsNotEmpty()
   @IsInt()
   readonly eventTypeId: number;

@@ -4,7 +4,7 @@ import { Repository, DeleteResult } from 'typeorm';
 import { Event, EventType } from './events.entity';
 import { validate } from 'class-validator';
 import { EventRO } from './events.interface';
-import { AddEventDto, UpdateEventDto } from './dto';
+import { AddEventDto, EditEventDto } from './dto';
 
 @Injectable()
 export class EventsService {
@@ -71,7 +71,7 @@ export class EventsService {
 
   public async editEvent(
     id: number,
-    { eventTypeId, locality, eventDate, active, userId }: UpdateEventDto,
+    { eventTypeId, locality, eventDate, active, userId }: EditEventDto,
   ): Promise<Event> {
     const eventToUpdate = await this.getEvent(id);
     if (!eventToUpdate) {
@@ -94,7 +94,7 @@ export class EventsService {
     return this.eventsRepository.delete({ id });
   }
 
-  private buildEventRO(event: Event) {
+  private buildEventRO(event: Event): EventRO {
     const eventRO = {
       id: event.id,
       event_type_id: event.event_type_id,
