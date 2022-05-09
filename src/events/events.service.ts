@@ -19,8 +19,30 @@ export class EventsService {
     return this.eventTypesRepository.find();
   }
 
+  public getEventType(id: number): Promise<EventType> {
+    return this.eventTypesRepository.findOne(id);
+  }
+
   public getEvents(): Promise<Event[]> {
     return this.eventsRepository.find();
+  }
+
+  public getEvent(id: number): Promise<Event> {
+    return this.eventsRepository.findOne(id);
+  }
+
+  public getEventByCredentials(
+    event_type_id: number,
+    locality: string,
+    event_date: string,
+  ): Promise<Event[]> {
+    return this.eventsRepository.find({
+      where: {
+        event_type_id,
+        locality,
+        event_date,
+      },
+    });
   }
 
   public async addEvent({
@@ -37,10 +59,9 @@ export class EventsService {
 
     const errors = await validate(newEvent);
     if (errors.length > 0) {
-      const _errors = { username: 'Event is not valid.' };
       throw new HttpException(
-        { message: 'Input data validation failed', _errors },
-        HttpStatus.BAD_REQUEST,
+        { status: 'error', message: 'Insert data validation failed.' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     } else {
       const savedUser = await this.eventsRepository.save(newEvent);
@@ -52,8 +73,14 @@ export class EventsService {
     id: number,
     { eventTypeId, locality, eventDate, active, userId }: UpdateEventDto,
   ): Promise<Event> {
-    const toUpdate = await this.eventsRepository.findOne(id);
-    const updated = Object.assign(toUpdate, {
+    const eventToUpdate = await this.getEvent(id);
+    if (!eventToUpdate) {
+      throw new HttpException(
+        { status: 'error', message: 'Event not found' },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const updated = Object.assign(eventToUpdate, {
       event_type_id: eventTypeId,
       locality,
       event_date: eventDate,

@@ -6,6 +6,8 @@ import {
   Post,
   Put,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { Event, EventType } from './events.entity';
@@ -28,16 +30,43 @@ export class EventsController {
   }
 
   @Post('add')
-  addEvent(@Body() eventData: AddEventDto): Promise<EventRO> {
+  async addEvent(@Body() eventData: AddEventDto): Promise<EventRO> {
+    const { eventTypeId, locality, eventDate } = eventData;
+
+    const event = await this.eventsService.getEventByCredentials(
+      eventTypeId,
+      locality,
+      eventDate,
+    );
+    if (event.length) {
+      const _error = { status: 'error', message: 'Event already exists.' };
+      throw new HttpException(_error, HttpStatus.CONFLICT);
+    }
+
+    const eventType = await this.eventsService.getEventType(eventTypeId);
+    if (!eventType) {
+      const _error = { status: 'error', message: 'Event type not found.' };
+      throw new HttpException(_error, HttpStatus.BAD_REQUEST);
+    }
+
     return this.eventsService.addEvent(eventData);
   }
 
   @Put(':eventId')
-  editEvent(
+  async editEvent(
     @Param() params,
     @Body() eventData: UpdateEventDto,
   ): Promise<Event> {
-    return this.eventsService.editEvent(params.eventId, eventData);
+    const { eventId } = params;
+    const { eventTypeId } = eventData;
+
+    const eventType = await this.eventsService.getEventType(eventTypeId);
+    if (!eventType) {
+      const _error = { status: 'error', message: 'Event type not found.' };
+      throw new HttpException(_error, HttpStatus.BAD_REQUEST);
+    }
+
+    return this.eventsService.editEvent(eventId, eventData);
   }
 
   @Delete(':eventId')
