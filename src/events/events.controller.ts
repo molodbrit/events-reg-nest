@@ -9,12 +9,14 @@ import {
   ParseIntPipe,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { Event, EventType } from './events.entity';
 import { EventRO } from './events.interface';
 import { AddEventDto, EditEventDto } from './dto';
 import { DeleteResult } from 'typeorm';
+import { JwtAuthGuard } from '../auth/jwt-auth.guards';
 
 @Controller('events')
 export class EventsController {
@@ -30,6 +32,7 @@ export class EventsController {
     return this.eventsService.getEvents();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('add')
   async addEvent(@Body() eventData: AddEventDto): Promise<EventRO> {
     const { eventTypeId, locality, eventDate } = eventData;
@@ -53,6 +56,7 @@ export class EventsController {
     return this.eventsService.addEvent(eventData);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':eventId')
   async editEvent(
     @Param('eventId', ParseIntPipe) eventId: number,
@@ -69,6 +73,7 @@ export class EventsController {
     return this.eventsService.editEvent(eventId, eventData);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':eventId')
   deleteEvent(
     @Param('eventId', ParseIntPipe) eventId: number,

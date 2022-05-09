@@ -9,22 +9,26 @@ import {
   HttpException,
   HttpStatus,
   Body,
+  UseGuards,
 } from '@nestjs/common';
 import { DeleteResult } from 'typeorm';
 import { AddUserDto, EditUserDto } from './dto';
 import { UserRO } from './user.interface';
 import { User } from './users.entity';
 import { UsersService } from './users.services';
+import { JwtAuthGuard } from '../auth/jwt-auth.guards';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   getUsers(): Promise<User[]> {
     return this.usersService.getUsers();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':userId')
   async getUser(@Param('userId', ParseIntPipe) userId: number): Promise<User> {
     const user = await this.usersService.getUser(userId);
@@ -35,6 +39,7 @@ export class UsersController {
     return user;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('add')
   async addUser(@Body() userData: AddUserDto): Promise<UserRO> {
     const { username } = userData;
@@ -48,6 +53,7 @@ export class UsersController {
     return this.usersService.addUser(userData);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':userId')
   async editUser(
     @Param('userId', ParseIntPipe) userId: number,
@@ -65,6 +71,7 @@ export class UsersController {
     return this.usersService.editUser(userId, userData);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':userId')
   deleteUser(
     @Param('userId', ParseIntPipe) userId: number,
