@@ -6,6 +6,7 @@ import {
   Post,
   Put,
   Delete,
+  ParseIntPipe,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
@@ -54,10 +55,9 @@ export class EventsController {
 
   @Put(':eventId')
   async editEvent(
-    @Param() params,
+    @Param('eventId', ParseIntPipe) eventId: number,
     @Body() eventData: UpdateEventDto,
   ): Promise<Event> {
-    const { eventId } = params;
     const { eventTypeId } = eventData;
 
     const eventType = await this.eventsService.getEventType(eventTypeId);
@@ -70,7 +70,9 @@ export class EventsController {
   }
 
   @Delete(':eventId')
-  deleteEvent(@Param() params): Promise<DeleteResult> {
-    return this.eventsService.deleteEvent(params.eventId);
+  deleteEvent(
+    @Param('eventId', ParseIntPipe) eventId: number,
+  ): Promise<DeleteResult> {
+    return this.eventsService.deleteEvent(eventId);
   }
 }
