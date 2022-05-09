@@ -1,13 +1,15 @@
 import {
   Controller,
   Post,
-  HttpException,
-  HttpStatus,
   Body,
+  Get,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { UserRO } from '../users/user.interface';
 import { UsersService } from '../users/users.services';
+import { JwtAuthGuard } from './jwt-auth.guards';
 
 @Controller('auth')
 export class AuthController {
@@ -19,18 +21,32 @@ export class AuthController {
 
     const user = await this.usersService.getUserByName(username);
     if (!user) {
-      const _error = { status: 'error', message: 'Incorrect username.' };
-      throw new HttpException(_error, HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException({
+        status: 'error',
+        message: 'Incorrect username.',
+      });
     }
     if (user.password !== password) {
-      const _error = { status: 'error', message: 'Incorrect password.' };
-      throw new HttpException(_error, HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException({
+        status: 'error',
+        message: 'Incorrect password.',
+      });
     }
     if (user.active === false) {
-      const _error = { status: 'error', message: 'Inactive user.' };
-      throw new HttpException(_error, HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException({
+        status: 'error',
+        message: 'Inactive user.',
+      });
     }
 
     return this.usersService.buildUserRO(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('status')
+  getStatus() {
+    return {
+      status: 'ok',
+    };
   }
 }
