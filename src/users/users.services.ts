@@ -4,7 +4,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import { validate } from 'class-validator';
 import { User } from './users.entity';
 import { AddUserDto, EditUserDto } from './dto';
-import { UserRO } from './user.interface';
+import { UserData, UserRO } from './users.interface';
 import { SECRET } from 'src/config';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -77,7 +77,7 @@ export class UsersService {
   }
 
   public buildUserRO(user: User): UserRO {
-    const userRO = {
+    const userRO: UserData = {
       id: user.id,
       username: user.username,
       active: user.active,

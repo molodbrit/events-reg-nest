@@ -13,10 +13,11 @@ import {
 } from '@nestjs/common';
 import { DeleteResult } from 'typeorm';
 import { AddUserDto, EditUserDto } from './dto';
-import { UserRO } from './user.interface';
+import { UserRO } from './users.interface';
 import { User } from './users.entity';
 import { UsersService } from './users.services';
 import { JwtAuthGuard } from '../auth/jwt-auth.guards';
+import { CommonResponse } from 'src/app.interface';
 
 @Controller('users')
 export class UsersController {
@@ -73,9 +74,16 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':userId')
-  deleteUser(
+  async deleteUser(
     @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<DeleteResult> {
-    return this.usersService.deleteUser(userId);
+  ): Promise<CommonResponse> {
+    const result: DeleteResult = await this.usersService.deleteUser(userId);
+
+    if (result.affected === 0) {
+      const _error = { status: 'error', message: 'User not found.' };
+      throw new HttpException(_error, HttpStatus.NOT_FOUND);
+    }
+
+    return { status: 'ok' };
   }
 }

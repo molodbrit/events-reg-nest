@@ -17,6 +17,7 @@ import { EventRO } from './events.interface';
 import { AddEventDto, EditEventDto } from './dto';
 import { DeleteResult } from 'typeorm';
 import { JwtAuthGuard } from '../auth/jwt-auth.guards';
+import { CommonResponse } from 'src/app.interface';
 
 @Controller('events')
 export class EventsController {
@@ -75,9 +76,16 @@ export class EventsController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':eventId')
-  deleteEvent(
+  async deleteEvent(
     @Param('eventId', ParseIntPipe) eventId: number,
-  ): Promise<DeleteResult> {
-    return this.eventsService.deleteEvent(eventId);
+  ): Promise<CommonResponse> {
+    const result: DeleteResult = await this.eventsService.deleteEvent(eventId);
+
+    if (result.affected === 0) {
+      const _error = { status: 'error', message: 'Event not found.' };
+      throw new HttpException(_error, HttpStatus.NOT_FOUND);
+    }
+
+    return { status: 'ok' };
   }
 }

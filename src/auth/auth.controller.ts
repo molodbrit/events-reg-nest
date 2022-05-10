@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
-import { UserRO } from '../users/user.interface';
+import { UserRO } from '../users/users.interface';
 import { UsersService } from '../users/users.services';
 import { JwtAuthGuard } from './jwt-auth.guards';
 

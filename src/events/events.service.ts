@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult } from 'typeorm';
 import { Event, EventType } from './events.entity';
 import { validate } from 'class-validator';
-import { EventRO } from './events.interface';
+import { EventData, EventRO } from './events.interface';
 import { AddEventDto, EditEventDto } from './dto';
 
 @Injectable()
@@ -95,7 +95,7 @@ export class EventsService {
   }
 
   private buildEventRO(event: Event): EventRO {
-    const eventRO = {
+    const eventRO: EventData = {
       id: event.id,
       event_type_id: event.event_type_id,
       locality: event.locality,
