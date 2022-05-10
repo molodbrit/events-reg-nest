@@ -5,7 +5,7 @@ import { validate } from 'class-validator';
 import { User } from './users.entity';
 import { AddUserDto, EditUserDto } from './dto';
 import { UserData, UserRO } from './users.interface';
-import { SECRET } from 'src/config';
+import { ConfigService } from '@nestjs/config';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const jwt = require('jsonwebtoken');
@@ -15,6 +15,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private configService: ConfigService,
   ) {}
 
   public getUsers(): Promise<User[]> {
@@ -88,6 +89,7 @@ export class UsersService {
   }
 
   private generateJWT(user) {
+    const SECRET = this.configService.get<string>('SECRET');
     return jwt.sign(
       {
         id: user.id,
