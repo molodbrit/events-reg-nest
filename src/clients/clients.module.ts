@@ -10,5 +10,6 @@ import { EventsService } from 'src/events/events.service';
   imports: [TypeOrmModule.forFeature([Client, Event, EventType])],
   controllers: [ClientsController],
   providers: [ClientsService, EventsService],
+  exports: [ClientsService],
 })
 export class ClientsModule {}

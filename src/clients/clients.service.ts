@@ -3,9 +3,10 @@ import { validate } from 'class-validator';
 import { DeleteResult, Repository } from 'typeorm';
 import { Client } from './clients.entity';
 import { AddClientDto, CheckRegistrationDto, EditClientDto } from './dto';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ClientData, ClientRO } from './clients.interface';
 
+@Injectable()
 export class ClientsService {
   constructor(
     @InjectRepository(Client)
